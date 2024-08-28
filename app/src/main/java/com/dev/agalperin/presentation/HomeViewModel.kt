@@ -26,27 +26,18 @@ class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provide
     fun getAllPoints(points: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             _state.update { it.copy(isLoading = true) }
-
-
-            getAllPointsUsecase.get().execute(points).collect { result ->
-                result.fold(
-                    onSuccess = { points ->
-                        _state.update { currentState ->
-                            currentState.copy(
-                                points = points,
-                                isLoading = false
-                            )
-                        }
-                    },
-                    onFailure = { error ->
-                        _effects.emit(HomeScreenEffect.ShowError(error))
-                        _state.update { currentState ->
-                            currentState.copy(
-                                isLoading = false
-                            )
-                        }
+            try {
+                getAllPointsUsecase.get().execute(points).collect { result ->
+                    _state.update { currentState ->
+                        currentState.copy(
+                            points = result
+                        )
                     }
-                )
+                }
+            } catch (e: Exception) {
+                _effects.emit(HomeScreenEffect.ShowError(e))
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }

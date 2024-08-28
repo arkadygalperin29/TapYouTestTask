@@ -5,5 +5,5 @@ import com.dev.tapyouapi.models.PointsResponse
 import kotlinx.coroutines.flow.Flow
 
 interface TapYouRepository {
-    fun getPointsFromApi(count: Int): Flow<Result<PointsResponse<PointDto>>>
+    fun getPointsFromApi(count: Int): Flow<PointsResponse<PointDto>>
 }

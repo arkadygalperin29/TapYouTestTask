@@ -8,10 +8,10 @@ import javax.inject.Inject
 
 class GetAllPointsUsecase @Inject constructor(private val repository: TapYouRepository) {
 
-    fun execute(count: Int): Flow<Result<List<Point>>> {
+    fun execute(count: Int): Flow<List<Point>> {
         return repository.getPointsFromApi(count).map { result ->
-            result.map { points ->
-                points.pointsList.map { it.toPoint() }
+            result.pointsList.map {
+                it.toPoint()
             }
         }
     }

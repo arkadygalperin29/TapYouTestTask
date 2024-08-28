@@ -128,14 +128,9 @@ class HomeFragment : Fragment() {
 
             launchButton.setOnClickListener {
                 val text = textInputLayout.text.toString()
-                val number = text.toIntOrNull()
+                val number = text.toInt()
 
-                if (number != null && number in 1..1000) {
-                    viewModel.getAllPoints(number)
-                } else {
-                    // If we decide to enable button if the input is not ranging from 1 to 1000 by chance.
-                    Toast.makeText(context, "Please enter a number between 1 and 1000", Toast.LENGTH_SHORT).show()
-                }
+                viewModel.getAllPoints(number)
 
                 KeyboardUtil.hideKeyboard(requireContext(), it)
             }

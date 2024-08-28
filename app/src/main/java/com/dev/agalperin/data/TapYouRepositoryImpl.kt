@@ -12,12 +12,10 @@ import javax.inject.Inject
 
 class TapYouRepositoryImpl @Inject constructor(private val tapYouApi: TapYouApi) : TapYouRepository {
 
-    override fun getPointsFromApi(count: Int): Flow<Result<PointsResponse<PointDto>>> {
+    override fun getPointsFromApi(count: Int): Flow<PointsResponse<PointDto>> {
         return flow {
             val response = tapYouApi.getPoints(count)
-            emit(Result.success(response))
-        }.catch { e->
-            Result.failure<Exception>(e)
+            emit(response)
         }
     }
 }
