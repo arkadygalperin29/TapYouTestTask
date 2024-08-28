@@ -2,12 +2,18 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kapt)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.dagger.hilt)
 }
 
 android {
     namespace = "com.dev.agalperin"
     compileSdk = 34
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 
     buildFeatures {
         viewBinding = true
@@ -21,7 +27,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        buildConfigField("String", "NEWS_API_BASE_URL", "\"https://hr-challenge.dev.tapyou.com/\"")
+        buildConfigField("String", "TAP_YOU_TEST_API_BASE_URL", "\"https://hr-challenge.dev.tapyou.com/\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,11 +42,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 
@@ -58,10 +64,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
     implementation(libs.dagger.hilt.android)
-    implementation(libs.dagger.hilt.compiler)
-
-    implementation(libs.retrofit2)
-    implementation(libs.logging.interceptor)
+    kapt(libs.dagger.hilt.compiler)
 
     implementation(project(":tapyouapi"))
 }
