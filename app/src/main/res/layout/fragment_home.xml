@@ -18,12 +18,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/coordinatesChart"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/launchCoordinatesButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/descriptionTv" />
+
     <Button
         android:id="@+id/launchCoordinatesButton"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:text="@string/launch_the_graph_coords_fetching_button_text"
-        app:layout_constraintTop_toBottomOf="@id/descriptionTv"
+        app:layout_constraintTop_toBottomOf="@id/coordinatesChart"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

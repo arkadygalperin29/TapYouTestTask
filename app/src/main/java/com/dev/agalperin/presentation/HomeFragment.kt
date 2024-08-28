@@ -11,6 +11,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.dev.agalperin.R
 import com.dev.agalperin.databinding.FragmentHomeBinding
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -34,20 +38,36 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-       lifecycleScope.launch {
+        binding?.apply {
+            launchCoordinatesButton.setOnClickListener {
+                viewModel.getAllPoints(24)
+            }
+        }
+
+        initChart()
+    }
+
+    private fun initChart() {
+        lifecycleScope.launch {
             viewModel.state.collect { state ->
                 // Update UI based on state
                 if (state.isLoading) {
                     // TODO show glide loader
                 } else {
                     // TODO Hide loader
-                }
-            }
-        }
+                    val entries = state.points.map { point ->
+                        Entry(point.x.toFloat(), point.y.toFloat())
+                    }
+                    val dataset = LineDataSet(entries, "points")
+                    dataset.color = android.graphics.Color.BLUE
+                    dataset.valueTextColor = android.graphics.Color.BLACK
 
-        binding?.apply {
-            launchCoordinatesButton.setOnClickListener {
-                viewModel.getAllPoints(24)
+                    val lineData = LineData(dataset)
+                    binding?.apply {
+                        coordinatesChart.data = lineData
+                        coordinatesChart.invalidate()
+                    }
+                }
             }
         }
     }

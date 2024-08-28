@@ -21,8 +21,7 @@ data class HomeFragmentState(
 )
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provider<GetAllPointsUsecase>) :
-    ViewModel() {
+class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provider<GetAllPointsUsecase>) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeFragmentState())
     val state = _state.asStateFlow()
