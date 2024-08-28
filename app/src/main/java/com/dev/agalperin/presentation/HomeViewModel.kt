@@ -15,16 +15,13 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provider<GetAllPointsUsecase>) :
-    ViewModel() {
+class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provider<GetAllPointsUsecase>) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeFragmentState())
     val state = _state.asStateFlow()
 
     private val _effects = MutableSharedFlow<HomeScreenEffect>()
     val effects = _effects.asSharedFlow()
-
-
 
     fun getAllPoints(points: Int) {
         viewModelScope.launch(Dispatchers.IO) {

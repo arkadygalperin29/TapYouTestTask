@@ -6,4 +6,6 @@
     <string name="server_error_message_ui">Очень внезапная (и страшная) ошибка.</string>
     <string name="unknown_error_message_ui">Неизвестная ошибка сервера: %1$s</string>
     <string name="Unknown_error_ui_message">Unexpected error: %1$s</string>
+    <string name="informative_text">Можно запросить от 1 до 1000 точек</string>
+    <string name="enter_the_digit">Введите цифру</string>
 </resources>

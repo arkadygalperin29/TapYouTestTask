@@ -1,8 +1,6 @@
 package com.dev.agalperin.data
 
-import android.net.http.HttpException
 import com.dev.agalperin.domain.TapYouRepository
-import com.dev.agalperin.domain.model.Point
 import com.dev.tapyouapi.TapYouApi
 import com.dev.tapyouapi.models.PointDto
 import com.dev.tapyouapi.models.PointsResponse

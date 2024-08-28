@@ -12,20 +12,42 @@
         android:id="@+id/descriptionTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_blank_fragment"
+        android:text="@string/informative_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/launchCoordinatesButton"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
+    <LinearLayout
+        android:id="@+id/inputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="@dimen/dimen_16"
-        android:text="@string/launch_the_graph_coords_fetching_button_text"
-        app:layout_constraintTop_toBottomOf="@id/descriptionTv"
+        app:layout_constraintTop_toBottomOf="@+id/descriptionTv"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="@dimen/dimen_16">
+            <EditText
+                android:id="@+id/inputDotsNumberEt"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/enter_the_digit"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/launchCoordinatesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/launch_the_graph_coords_fetching_button_text" />
+
+    </LinearLayout>
+
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/coordinatesChart"
@@ -35,6 +57,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/launchCoordinatesButton" />
+        app:layout_constraintTop_toBottomOf="@+id/inputLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

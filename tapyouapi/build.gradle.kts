@@ -10,7 +10,7 @@ java {
 }
 
 dependencies {
-    implementation(libs.retrofit2)
+    api(libs.retrofit2)
     implementation(libs.kotlinx.coroutines.core)
     api (libs.kotlinx.serialization.json)
     implementation(libs.androidx.annotation)
