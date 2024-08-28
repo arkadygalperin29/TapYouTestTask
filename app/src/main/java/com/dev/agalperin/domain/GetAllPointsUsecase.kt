@@ -15,13 +15,4 @@ class GetAllPointsUsecase @Inject constructor(private val repository: TapYouRepo
             }
         }
     }
-
-//            internal operator fun invoke(query: String): Flow<RequestResult<List<ArticleUI>>> {
-//        return repository.getAll(query = query)
-//            .map { requestResult ->
-//                requestResult.map { articles ->
-//                    articles.map { it.toUiArticle() }
-//                }
-//            }
-//    }
 }
