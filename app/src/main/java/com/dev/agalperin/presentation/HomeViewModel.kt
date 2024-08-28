@@ -3,6 +3,7 @@ package com.dev.agalperin.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dev.agalperin.domain.GetAllPointsUsecase
+import com.dev.agalperin.utils.ErrorType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,11 +12,13 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Provider
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provider<GetAllPointsUsecase>) : ViewModel() {
+class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provider<GetAllPointsUsecase>) :
+    ViewModel() {
 
     private val _state = MutableStateFlow(HomeFragmentState())
     val state = _state.asStateFlow()
@@ -34,12 +37,15 @@ class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provide
                         )
                     }
                 }
+            } catch (e: HttpException) {
+                _effects.emit(HomeScreenEffect.ShowError(ErrorType.HttpError(e)))
             } catch (e: Exception) {
-                _effects.emit(HomeScreenEffect.ShowError(e))
+                _effects.emit(HomeScreenEffect.ShowError(ErrorType.UndefinedError(e)))
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }
         }
     }
 }
+
 
