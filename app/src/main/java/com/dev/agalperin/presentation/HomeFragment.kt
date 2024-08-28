@@ -145,7 +145,7 @@ class HomeFragment : Fragment() {
 
     private fun handleError(error: ErrorType) {
         val errorMessage = when (error) {
-            is ErrorType.HttpError -> getString(R.string.server_error_message_ui, error.error.message())
+            is ErrorType.HttpError -> error.message
             is ErrorType.UndefinedError -> getString(R.string.unknown_error_ui_message, error.error.message)
         }
         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()

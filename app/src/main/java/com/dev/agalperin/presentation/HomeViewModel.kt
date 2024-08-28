@@ -38,7 +38,8 @@ class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provide
                     }
                 }
             } catch (e: HttpException) {
-                _effects.emit(HomeScreenEffect.ShowError(ErrorType.HttpError(e)))
+                val errorMessage = e.response()?.errorBody()?.string()
+                _effects.emit(HomeScreenEffect.ShowError(ErrorType.HttpError(errorMessage)))
             } catch (e: Exception) {
                 _effects.emit(HomeScreenEffect.ShowError(ErrorType.UndefinedError(e)))
             } finally {
