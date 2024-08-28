@@ -67,6 +67,9 @@ dependencies {
     //Prepared XML solution for Chart
     implementation (libs.mpandroidchart)
 
+    //Glide
+    implementation (libs.github.glide)
+
     // Navigation
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)

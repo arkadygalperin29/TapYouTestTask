@@ -5,7 +5,7 @@ import com.dev.tapyouapi.models.PointDto
 
 fun PointDto.toPoint(): Point {
     return Point(
-        x = x,
-        y = y
+        x = x.toFloat(),
+        y = y.toFloat()
     )
 }
