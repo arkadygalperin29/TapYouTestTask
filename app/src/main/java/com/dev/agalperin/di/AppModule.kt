@@ -1,7 +1,10 @@
 package com.dev.agalperin.di
 
 import com.dev.agalperin.BuildConfig
+import com.dev.agalperin.domain.GetAllPointsUsecase
+import com.dev.agalperin.domain.TapYouRepository
 import com.dev.tapyouapi.TapYouApi
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

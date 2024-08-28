@@ -3,6 +3,7 @@ package com.dev.tapyouapi
 import com.dev.tapyouapi.models.PointDto
 import com.dev.tapyouapi.models.PointsResponse
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -14,7 +15,7 @@ import retrofit2.http.Query
 interface TapYouApi {
 
     @GET("/api/test/points")
-    suspend fun getPoints(@Query("count") amountOfDots: Int): Result<PointsResponse<PointDto>>
+    suspend fun getPoints(@Query("count") amountOfDots: Int): PointsResponse<PointDto>
 }
 
 

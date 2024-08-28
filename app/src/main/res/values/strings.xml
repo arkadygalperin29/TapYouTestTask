@@ -2,4 +2,5 @@
     <string name="app_name">My Application</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="launch_the_graph_coords_fetching_button_text">Поехали</string>
 </resources>
