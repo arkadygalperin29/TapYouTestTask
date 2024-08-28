@@ -20,7 +20,7 @@ import javax.inject.Provider
 class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provider<GetAllPointsUsecase>) :
     ViewModel() {
 
-    private val _state = MutableStateFlow(HomeFragmentState())
+    private val _state = MutableStateFlow(HomeScreenState())
     val state = _state.asStateFlow()
 
     private val _effects = MutableSharedFlow<HomeScreenEffect>()
