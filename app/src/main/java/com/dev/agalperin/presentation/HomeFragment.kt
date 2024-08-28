@@ -8,8 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.RequestManager
 import com.dev.agalperin.R
 import com.dev.agalperin.databinding.FragmentHomeBinding
 import com.dev.agalperin.utils.ErrorType
@@ -19,6 +21,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -27,9 +30,11 @@ class HomeFragment : Fragment() {
     private var binding: FragmentHomeBinding? = null
     private val viewModel: HomeViewModel by viewModels()
 
+    @Inject
+    lateinit var glide: RequestManager
+
     companion object {
         private const val LINEDATA_LABEL = "points"
-        private const val SERVER_ERROR_STATUS = "500"
     }
 
     override fun onCreateView(
@@ -60,9 +65,9 @@ class HomeFragment : Fragment() {
             viewModel.state.collect { state ->
                 binding?.apply {
                     if (state.isLoading) {
-                        // TODO show glide loader
+                        showLoader()
                     } else {
-
+                        hideLoader()
                         val entries = state.points
                             .sortedBy { point -> point.x }
                             .map { point ->
@@ -82,7 +87,7 @@ class HomeFragment : Fragment() {
                         val lineData = LineData(dataset)
 
                         coordinatesChart.apply {
-                            coordinatesChart.setVisibleXRangeMaximum(1000f);
+                            setVisibleXRangeMaximum(1000f);
                             data = lineData
                             invalidate()
                         }
@@ -94,38 +99,56 @@ class HomeFragment : Fragment() {
 
     private fun initViews() {
         binding?.apply {
-            val textInputLayout = inputDotsNumberEt
-            val launchButton = launchCoordinatesButton
 
-            // Initially disable the button
-            launchButton.isEnabled = false
+            launchCoordinatesButton.isEnabled = false
 
-            // Add a TextWatcher to the EditText to listen for text changes
-            textInputLayout.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                    // No-op
-                }
+            inputDotsNumberEt.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {}
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    // Check if the input is a valid integer within the range
+                    // Check if the input is a valid integer within the range, so we don't allow user to send errors intentionally ;)
                     val text = s.toString()
                     val number = text.toIntOrNull()
-                    launchButton.isEnabled = number != null && number in 1 until 1000
+                    launchCoordinatesButton.isEnabled = number != null && number in 1 until 1000
                 }
 
-                override fun afterTextChanged(s: Editable?) {
-                    // No-op
-                }
+                override fun afterTextChanged(s: Editable?) {}
             })
 
-            launchButton.setOnClickListener {
-                val text = textInputLayout.text.toString()
+            launchCoordinatesButton.setOnClickListener {
+                val text = inputDotsNumberEt.text.toString()
                 val number = text.toInt()
 
                 viewModel.getAllPoints(number)
 
                 KeyboardUtil.hideKeyboard(requireContext(), it)
             }
+        }
+    }
+
+    private fun showLoader() {
+        binding?.apply {
+            val loader = AppCompatResources.getDrawable(
+                requireContext(),
+                R.drawable.loader_tap_you
+            )
+            glide.load(loader).into(loaderIv)
+            loaderIv.visibility = View.VISIBLE
+            inputDotsNumberEt.isClickable = false
+            launchCoordinatesButton.isClickable = false
+        }
+    }
+
+    private fun hideLoader() {
+        binding?.apply {
+            loaderIv.visibility = View.GONE
+            inputDotsNumberEt.isClickable = false
+            launchCoordinatesButton.isClickable = false
         }
     }
 
@@ -146,7 +169,10 @@ class HomeFragment : Fragment() {
     private fun handleError(error: ErrorType) {
         val errorMessage = when (error) {
             is ErrorType.HttpError -> error.message
-            is ErrorType.UndefinedError -> getString(R.string.unknown_error_ui_message, error.error.message)
+            is ErrorType.UndefinedError -> getString(
+                R.string.unknown_error_ui_message,
+                error.error.message
+            )
         }
         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
     }
