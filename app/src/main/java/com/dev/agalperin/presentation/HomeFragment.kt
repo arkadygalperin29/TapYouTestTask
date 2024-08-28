@@ -147,8 +147,8 @@ class HomeFragment : Fragment() {
     private fun hideLoader() {
         binding?.apply {
             loaderIv.visibility = View.GONE
-            inputDotsNumberEt.isClickable = false
-            launchCoordinatesButton.isClickable = false
+            inputDotsNumberEt.isClickable = true
+            launchCoordinatesButton.isClickable = true
         }
     }
 

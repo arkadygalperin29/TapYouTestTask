@@ -13,7 +13,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface TapYouApi {
-
     @GET("/api/test/points")
     suspend fun getPoints(@Query("count") amountOfDots: Int): PointsResponse<PointDto>
 }
