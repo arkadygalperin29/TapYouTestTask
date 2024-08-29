@@ -80,6 +80,8 @@ class HomeFragment : Fragment() {
                         }
 
                         val dataset = LineDataSet(entries, LINEDATA_LABEL).apply {
+                            mode = LineDataSet.Mode.CUBIC_BEZIER
+                            cubicIntensity = 0.2f
                             color = android.graphics.Color.BLUE
                             valueTextColor = android.graphics.Color.BLACK
                         }
