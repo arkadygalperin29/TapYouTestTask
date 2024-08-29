@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Provider
@@ -20,8 +21,7 @@ import javax.inject.Provider
 class HomeViewModel @Inject constructor(
     private val getAllPointsUsecase: Provider<GetAllPointsUsecase>,
     private val dispatchers: AppDispatchers
-) :
-    ViewModel() {
+) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeScreenState())
     val state = _state.asStateFlow()
@@ -30,15 +30,16 @@ class HomeViewModel @Inject constructor(
     val effects = _effects.asSharedFlow()
 
     fun getAllPoints(points: Int) {
-        viewModelScope.launch(dispatchers.io) {
+        viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
-                getAllPointsUsecase.get().execute(points).collect { result ->
-                    _state.update { currentState ->
-                        currentState.copy(
-                            points = result.sortedBy { point -> point.x }
-                        )
-                    }
+                val result = withContext(dispatchers.io) {
+                    getAllPointsUsecase.get().execute(points)
+                }
+                _state.update { currentState ->
+                    currentState.copy(
+                        points = result
+                    )
                 }
             } catch (e: HttpException) {
                 val errorMessage = e.response()?.errorBody()?.string()

@@ -1,4 +1,4 @@
-package com.dev.agalperin.utils
+package com.dev.agalperin.data
 
 import com.dev.agalperin.domain.model.Point
 import com.dev.tapyouapi.models.PointDto
