@@ -20,6 +20,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -51,11 +53,32 @@ class HomeFragment : Fragment() {
     @Inject
     lateinit var glide: RequestManager
 
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+
     companion object {
         private const val LINEDATA_LABEL = "points"
-        private const val REQUEST_WRITE_PERMISSION = 1001
         private const val IMAGE_SAVED_TOAST_TEXT = "Изображение сохранено, нажмите чтобы перейти"
+        private const val MOVE_TO_GALLERY = "Перейти в галерею"
+        private const val PERMISSION_TO_SAVE_IMAGE_DENIED =
+            "Разрешение отклонено. Нельзя сохранить изображение"
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (isGranted) {
+                    saveChartImage()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        PERMISSION_TO_SAVE_IMAGE_DENIED,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -255,15 +278,12 @@ class HomeFragment : Fragment() {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
                     ) != PackageManager.PERMISSION_GRANTED
                 ) {
-                    ActivityCompat.requestPermissions(
-                        requireActivity(),
-                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                        REQUEST_WRITE_PERMISSION
-                    )
+                    requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 } else {
                     saveChartImage()
                 }
             }
+
             else -> saveChartImage()
         }
     }
@@ -276,16 +296,18 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_WRITE_PERMISSION && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            saveChartImage()
-        }
-    }
+//    override fun onRequestPermissionsResult(
+//        requestCode: Int,
+//        permissions: Array<out String>,
+//        grantResults: IntArray
+//    ) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        if (requestCode == REQUEST_WRITE_PERMISSION && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//            saveChartImage()
+//        } else {
+//            Toast.makeText(requireContext(), PERMISSION_TO_SAVE_IMAGE_DENIED, Toast.LENGTH_SHORT).show()
+//        }
+//    }
 
     private fun showImageSavedSnackbar(uri: Uri) {
         val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -298,7 +320,7 @@ class HomeFragment : Fragment() {
             IMAGE_SAVED_TOAST_TEXT,
             Snackbar.LENGTH_LONG
         )
-        snackbar.setAction("View") {
+        snackbar.setAction(MOVE_TO_GALLERY) {
             startActivity(intent)
         }
         snackbar.show()
