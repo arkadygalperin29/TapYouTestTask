@@ -1,26 +1,19 @@
 package com.dev.agalperin.data
 
-import com.dev.agalperin.domain.TapYouRepository
 import com.dev.agalperin.domain.TapYouRepositoryTest
-import com.dev.tapyouapi.models.PointDto
-import com.dev.tapyouapi.models.PointsResponse
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import com.dev.agalperin.domain.model.PointTest
+import com.dev.agalperin.domain.model.PointsResponseTest
 
 class FakeTapYouRepositoryImpl : TapYouRepositoryTest {
-    override fun getPointsFromApi(count: Int): Flow<PointsResponse<PointDto>> {
-        return flow {
-            emit(
-                PointsResponse(
-                    listOf(
-                        PointDto(x = 5.0, y = 5.0),
-                        PointDto(x = 5.0, y = 7.0),
-                        PointDto(x = 8.0, y = 4.0),
-                        PointDto(x = 10.0, y = 7.0),
-                        PointDto(x = 13.0, y = 11.0),
-                    )
-                )
+    override suspend fun getPointsFromApi(count: Int): PointsResponseTest<PointTest> {
+        return PointsResponseTest(
+            listOf(
+                PointTest(x = 5.0, y = 5.0),
+                PointTest(x = 5.0, y = 7.0),
+                PointTest(x = 8.0, y = 4.0),
+                PointTest(x = 10.0, y = 7.0),
+                PointTest(x = 13.0, y = 11.0),
             )
-        }
+        )
     }
 }
