@@ -161,7 +161,7 @@ class HomeFragment : Fragment() {
                 object : GestureDetector.SimpleOnGestureListener() {
                     override fun onSingleTapUp(e: MotionEvent): Boolean {
                         KeyboardUtil.hideKeyboard(requireContext(), root)
-                        binding?.inputDotsNumberEt?.clearFocus()
+                        inputDotsNumberEt.clearFocus()
                         return true
                     }
                 })
