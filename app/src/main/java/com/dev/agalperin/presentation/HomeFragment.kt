@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.GestureDetector
@@ -53,32 +54,6 @@ class HomeFragment : Fragment() {
     @Inject
     lateinit var glide: RequestManager
 
-    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
-
-    companion object {
-        private const val LINEDATA_LABEL = "points"
-        private const val IMAGE_SAVED_TOAST_TEXT = "Изображение сохранено, нажмите чтобы перейти"
-        private const val MOVE_TO_GALLERY = "Перейти в галерею"
-        private const val PERMISSION_TO_SAVE_IMAGE_DENIED =
-            "Разрешение отклонено. Нельзя сохранить изображение"
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) {
-                    saveChartImage()
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        PERMISSION_TO_SAVE_IMAGE_DENIED,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-    }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -93,11 +68,20 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (isGranted) {
+                    saveChartImage()
+                } else {
+                    showPermissionDeniedSnackbar()
+                }
+            }
+
         initChart()
 
         initViews()
 
-        initSaveChartButton()
+        initSaveChartButton(requestPermissionLauncher)
 
         clearFocusByLayoutTapping()
 
@@ -128,7 +112,7 @@ class HomeFragment : Fragment() {
                             return@collect
                         }
 
-                        val dataset = LineDataSet(entries, LINEDATA_LABEL).apply {
+                        val dataset = LineDataSet(entries, requireContext().getString(R.string.linedata_label)).apply {
                             mode = LineDataSet.Mode.CUBIC_BEZIER
                             cubicIntensity = 0.2f
                             color = android.graphics.Color.BLUE
@@ -270,7 +254,7 @@ class HomeFragment : Fragment() {
         return Uri.fromFile(imageFile)
     }
 
-    private fun checkPermissionsAndSaveImage() {
+    private fun checkPermissionsAndSaveImage(requestPermissionLauncher: ActivityResultLauncher<String>) {
         when {
             Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
                 if (ContextCompat.checkSelfPermission(
@@ -288,26 +272,14 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun initSaveChartButton() {
+    private fun initSaveChartButton(requestPermissionLauncher: ActivityResultLauncher<String>) {
         binding?.apply {
             saveChartToStorageButton.setOnClickListener {
-                checkPermissionsAndSaveImage()
+                checkPermissionsAndSaveImage(requestPermissionLauncher)
+                KeyboardUtil.hideKeyboard(requireContext(), it)
             }
         }
     }
-
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        if (requestCode == REQUEST_WRITE_PERMISSION && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//            saveChartImage()
-//        } else {
-//            Toast.makeText(requireContext(), PERMISSION_TO_SAVE_IMAGE_DENIED, Toast.LENGTH_SHORT).show()
-//        }
-//    }
 
     private fun showImageSavedSnackbar(uri: Uri) {
         val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -317,12 +289,30 @@ class HomeFragment : Fragment() {
 
         val snackbar = Snackbar.make(
             binding?.root ?: return,
-            IMAGE_SAVED_TOAST_TEXT,
+            requireContext().getString(R.string.image_saved_click_to_navigate_to_gallery),
             Snackbar.LENGTH_LONG
         )
-        snackbar.setAction(MOVE_TO_GALLERY) {
+        snackbar.setAction(requireContext().getString(R.string.navigate_to_gallery_after_saved_image_hint)) {
             startActivity(intent)
         }
+        snackbar.show()
+    }
+
+    private fun showPermissionDeniedSnackbar() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireContext().packageName, null)
+        }
+
+        val snackbar = Snackbar.make(
+            binding?.root ?: return,
+            requireContext().getString(R.string.permission_to_save_images_declined_hint),
+            Snackbar.LENGTH_LONG
+        )
+
+        snackbar.setAction(requireContext().getString(R.string.navigate_to_settings_snackbar_action_hint)) {
+            startActivity(intent)
+        }
+
         snackbar.show()
     }
 

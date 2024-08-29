@@ -9,4 +9,9 @@
     <string name="informative_text">Можно запросить от 1 до 1000 точек</string>
     <string name="enter_the_digit">Введите цифру</string>
     <string name="save_chart">Сохранить график</string>
+    <string name="image_saved_click_to_navigate_to_gallery">Изображение сохранено, нажмите чтобы перейти</string>
+    <string name="permission_to_save_images_declined_hint">Разрешение отклонено. Включите его перейдя в настройки</string>
+    <string name="navigate_to_gallery_after_saved_image_hint">Перейти в галерею</string>
+    <string name="linedata_label">points</string>
+    <string name="navigate_to_settings_snackbar_action_hint">Перейти в настройки</string>
 </resources>
