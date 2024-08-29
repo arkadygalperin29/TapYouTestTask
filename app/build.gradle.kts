@@ -66,12 +66,10 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
-    testImplementation ("org.junit.jupiter:junit-jupiter-api:5.8.2")
-    testImplementation ("org.junit.jupiter:junit-jupiter-engine:5.8.2")
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
-    testImplementation("org.mockito:mockito-core:5.2.1")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
 
     implementation(libs.kotlinx.coroutines.core)
 
