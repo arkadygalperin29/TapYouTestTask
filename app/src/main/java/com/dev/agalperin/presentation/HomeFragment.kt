@@ -1,17 +1,29 @@
 package com.dev.agalperin.presentation
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentValues
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.GestureDetector
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.RequestManager
@@ -22,8 +34,11 @@ import com.dev.agalperin.utils.KeyboardUtil
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 
@@ -38,6 +53,8 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val LINEDATA_LABEL = "points"
+        private const val REQUEST_WRITE_PERMISSION = 1001
+        private const val IMAGE_SAVED_TOAST_TEXT = "Изображение сохранено, нажмите чтобы перейти"
     }
 
     override fun onCreateView(
@@ -57,9 +74,12 @@ class HomeFragment : Fragment() {
 
         initViews()
 
+        initSaveChartButton()
+
         clearFocusByLayoutTapping()
 
         clearFocusByChartTapping()
+
     }
 
     override fun onResume() {
@@ -171,6 +191,117 @@ class HomeFragment : Fragment() {
                 else return@setOnTouchListener v.onTouchEvent(event)
             }
         }
+    }
+
+    private fun saveChartImage() {
+        binding?.apply {
+            val bitmap = Bitmap.createBitmap(
+                coordinatesChart.width,
+                coordinatesChart.height,
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            coordinatesChart.draw(canvas)
+
+            val filename = "chart_image_${System.currentTimeMillis()}.png"
+            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                saveImageToStorageAboveQ(bitmap, filename)
+            } else {
+                saveImageToStorageBelowQ(bitmap, filename)
+            }
+
+            uri?.let {
+                showImageSavedSnackbar(it)
+            }
+        }
+    }
+
+    private fun saveImageToStorageAboveQ(bitmap: Bitmap, filename: String): Uri? {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+        }
+
+        val uri = requireContext().contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )
+        uri?.let {
+            requireContext().contentResolver.openOutputStream(it).use { outputStream ->
+                if (outputStream != null) {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                }
+            }
+        }
+        return uri
+    }
+
+    private fun saveImageToStorageBelowQ(bitmap: Bitmap, filename: String): Uri? {
+        val picturesDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val imageFile = File(picturesDir, filename)
+        FileOutputStream(imageFile).use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        }
+        return Uri.fromFile(imageFile)
+    }
+
+    private fun checkPermissionsAndSaveImage() {
+        when {
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
+                if (ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    ActivityCompat.requestPermissions(
+                        requireActivity(),
+                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        REQUEST_WRITE_PERMISSION
+                    )
+                } else {
+                    saveChartImage()
+                }
+            }
+            else -> saveChartImage()
+        }
+    }
+
+    private fun initSaveChartButton() {
+        binding?.apply {
+            saveChartToStorageButton.setOnClickListener {
+                checkPermissionsAndSaveImage()
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_WRITE_PERMISSION && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            saveChartImage()
+        }
+    }
+
+    private fun showImageSavedSnackbar(uri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "image/png")
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+
+        val snackbar = Snackbar.make(
+            binding?.root ?: return,
+            IMAGE_SAVED_TOAST_TEXT,
+            Snackbar.LENGTH_LONG
+        )
+        snackbar.setAction("View") {
+            startActivity(intent)
+        }
+        snackbar.show()
     }
 
     private fun showLoader() {
