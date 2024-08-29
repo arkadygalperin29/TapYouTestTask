@@ -78,4 +78,5 @@ dependencies {
     kapt(libs.dagger.hilt.compiler)
 
     implementation(project(":tapyouapi"))
+    implementation(project(":core"))
 }

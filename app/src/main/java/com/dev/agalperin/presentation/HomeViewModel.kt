@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dev.agalperin.domain.GetAllPointsUsecase
 import com.dev.agalperin.utils.ErrorType
+import com.dev.core.AppDispatchers
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -17,7 +17,10 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provider<GetAllPointsUsecase>) :
+class HomeViewModel @Inject constructor(
+    private val getAllPointsUsecase: Provider<GetAllPointsUsecase>,
+    private val dispatchers: AppDispatchers
+) :
     ViewModel() {
 
     private val _state = MutableStateFlow(HomeScreenState())
@@ -27,7 +30,7 @@ class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provide
     val effects = _effects.asSharedFlow()
 
     fun getAllPoints(points: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io) {
             _state.update { it.copy(isLoading = true) }
             try {
                 getAllPointsUsecase.get().execute(points).collect { result ->

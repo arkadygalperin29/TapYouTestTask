@@ -26,3 +26,4 @@ dependencyResolutionManagement {
 rootProject.name = "My Application"
 include(":app")
 include(":tapyouapi")
+include(":core")

@@ -8,6 +8,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.dev.agalperin.BuildConfig
 import com.dev.agalperin.domain.GetAllPointsUsecase
 import com.dev.agalperin.domain.TapYouRepository
+import com.dev.core.AppDispatchers
 import com.dev.tapyouapi.TapYouApi
 import dagger.Binds
 import dagger.Module
@@ -37,5 +38,11 @@ object AppModule {
                 RequestOptions()
                     .diskCacheStrategy(DiskCacheStrategy.DATA)
             )
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppCoroutinesDispatchers(): AppDispatchers {
+        return AppDispatchers()
     }
 }
