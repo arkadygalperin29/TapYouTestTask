@@ -33,7 +33,7 @@ class HomeViewModel @Inject constructor(private val getAllPointsUsecase: Provide
                 getAllPointsUsecase.get().execute(points).collect { result ->
                     _state.update { currentState ->
                         currentState.copy(
-                            points = result
+                            points = result.sortedBy { point -> point.x }
                         )
                     }
                 }

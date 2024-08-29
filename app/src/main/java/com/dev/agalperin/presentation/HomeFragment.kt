@@ -76,7 +76,6 @@ class HomeFragment : Fragment() {
                     } else {
                         hideLoader()
                         val entries = state.points
-                            .sortedBy { point -> point.x }
                             .map { point ->
                                 Entry(point.x, point.y)
                             }
