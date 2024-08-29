@@ -28,7 +28,11 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        buildConfigField("String", "TAP_YOU_TEST_API_BASE_URL", "\"https://hr-challenge.dev.tapyou.com/\"")
+        buildConfigField(
+            "String",
+            "TAP_YOU_TEST_API_BASE_URL",
+            "\"https://hr-challenge.dev.tapyou.com/\""
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -58,17 +62,26 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
+    testImplementation ("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testImplementation ("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation("org.mockito:mockito-core:5.2.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+
+    implementation(libs.kotlinx.coroutines.core)
 
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
     //Prepared XML solution for Chart
-    implementation (libs.mpandroidchart)
+    implementation(libs.mpandroidchart)
 
     //Glide
-    implementation (libs.github.glide)
+    implementation(libs.github.glide)
 
     // Navigation
     implementation(libs.androidx.navigation.fragment.ktx)
@@ -78,5 +91,6 @@ dependencies {
     kapt(libs.dagger.hilt.compiler)
 
     implementation(project(":tapyouapi"))
+    testImplementation (project(":tapyouapi"))
     implementation(project(":core"))
 }
