@@ -128,6 +128,8 @@ class HomeFragment : Fragment() {
 
                 viewModel.getAllPoints(number)
 
+                inputDotsNumberEt.text.clear()
+
                 KeyboardUtil.hideKeyboard(requireContext(), it)
             }
         }

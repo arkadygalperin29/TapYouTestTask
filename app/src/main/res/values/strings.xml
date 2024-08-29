@@ -8,4 +8,5 @@
     <string name="unknown_error_ui_message">Unexpected error: %1$s</string>
     <string name="informative_text">Можно запросить от 1 до 1000 точек</string>
     <string name="enter_the_digit">Введите цифру</string>
+    <string name="save_chart">Сохранить график</string>
 </resources>
