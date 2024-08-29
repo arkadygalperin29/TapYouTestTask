@@ -1,10 +1,13 @@
 package com.dev.agalperin.presentation
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.GestureDetector
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -53,6 +56,10 @@ class HomeFragment : Fragment() {
         initChart()
 
         initViews()
+
+        clearFocusByLayoutTapping()
+
+        clearFocusByChartTapping()
     }
 
     override fun onResume() {
@@ -110,7 +117,8 @@ class HomeFragment : Fragment() {
                     start: Int,
                     count: Int,
                     after: Int
-                ) {}
+                ) {
+                }
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     // Check if the input is a valid integer within the range, so we don't allow user to send errors intentionally ;)
@@ -131,6 +139,37 @@ class HomeFragment : Fragment() {
                 inputDotsNumberEt.text.clear()
 
                 KeyboardUtil.hideKeyboard(requireContext(), it)
+            }
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun clearFocusByLayoutTapping() {
+        binding?.apply {
+            homeFragmentLayout.setOnTouchListener { _, _ ->
+                KeyboardUtil.hideKeyboard(requireContext(), homeFragmentLayout)
+                inputDotsNumberEt.clearFocus()
+                true
+            }
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun clearFocusByChartTapping() {
+        binding?.apply {
+            val gestureDetector = GestureDetector(
+                requireContext(),
+                object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onSingleTapUp(e: MotionEvent): Boolean {
+                        KeyboardUtil.hideKeyboard(requireContext(), root)
+                        binding?.inputDotsNumberEt?.clearFocus()
+                        return true
+                    }
+                })
+
+            coordinatesChart.setOnTouchListener { v, event ->
+                if (gestureDetector.onTouchEvent(event)) return@setOnTouchListener true
+                else return@setOnTouchListener v.onTouchEvent(event)
             }
         }
     }

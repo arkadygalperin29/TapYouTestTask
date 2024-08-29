@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@+id/homeFragment">
+    app:startDestination="@+id/home_fragment_layout">
 
     <fragment
-        android:id="@+id/homeFragment"
+        android:id="@+id/home_fragment_layout"
         android:name="com.dev.agalperin.presentation.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home"/>
