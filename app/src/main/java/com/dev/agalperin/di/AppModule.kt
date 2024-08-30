@@ -45,4 +45,10 @@ object AppModule {
     fun provideAppCoroutinesDispatchers(): AppDispatchers {
         return AppDispatchers()
     }
+
+    @Provides
+    @Singleton
+    fun provideApplicationContext(@ApplicationContext context: Context): Context {
+        return context
+    }
 }

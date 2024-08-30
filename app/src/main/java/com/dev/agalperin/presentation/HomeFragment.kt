@@ -24,7 +24,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -71,7 +70,7 @@ class HomeFragment : Fragment() {
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
                 if (isGranted) {
-                    saveChartImage()
+                    binding?.coordinatesChart?.let { viewModel.saveChartImage(it) }
                 } else {
                     showPermissionDeniedSnackbar()
                 }
@@ -87,11 +86,8 @@ class HomeFragment : Fragment() {
 
         clearFocusByChartTapping()
 
-    }
-
-    override fun onResume() {
-        super.onResume()
         initErrorHandler()
+
     }
 
     private fun initChart() {
@@ -112,7 +108,10 @@ class HomeFragment : Fragment() {
                             return@collect
                         }
 
-                        val dataset = LineDataSet(entries, requireContext().getString(R.string.linedata_label)).apply {
+                        val dataset = LineDataSet(
+                            entries,
+                            requireContext().getString(R.string.linedata_label)
+                        ).apply {
                             mode = LineDataSet.Mode.CUBIC_BEZIER
                             cubicIntensity = 0.2f
                             color = android.graphics.Color.BLUE
@@ -200,77 +199,23 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun saveChartImage() {
-        //need try catch for bitmap
-        binding?.apply {
-            val bitmap = Bitmap.createBitmap(
-                coordinatesChart.width,
-                coordinatesChart.height,
-                Bitmap.Config.ARGB_8888
-            )
-            val canvas = Canvas(bitmap)
-            coordinatesChart.draw(canvas)
-
-            val filename = "chart_image_${System.currentTimeMillis()}.png"
-            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                saveImageToStorageAboveQ(bitmap, filename) //not main thread viewmodel
-            } else {
-                saveImageToStorageBelowQ(bitmap, filename)  //not main thread from viewmodel
-            }
-
-            uri?.let {
-                showImageSavedSnackbar(it) //viewmodel dispatcher default
-            }
-        }
-    }
-
-    private fun saveImageToStorageAboveQ(bitmap: Bitmap, filename: String): Uri? {
-        //viewmodel dispatcher default
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
-            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-        }
-
-        val uri = requireContext().contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
-        )
-        uri?.let {
-            requireContext().contentResolver.openOutputStream(it).use { outputStream ->
-                if (outputStream != null) {
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                }
-            }
-        }
-        return uri
-    }
-
-    private fun saveImageToStorageBelowQ(bitmap: Bitmap, filename: String): Uri? {
-        val picturesDir =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        val imageFile = File(picturesDir, filename)
-        FileOutputStream(imageFile).use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-        }
-        return Uri.fromFile(imageFile)
-    }
-
     private fun checkPermissionsAndSaveImage(requestPermissionLauncher: ActivityResultLauncher<String>) {
-        when {
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                } else {
-                    saveChartImage()
+        binding?.apply {
+            when {
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
+                    if (ContextCompat.checkSelfPermission(
+                            requireContext(),
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    } else {
+                        viewModel.saveChartImage(coordinatesChart)
+                    }
                 }
-            }
 
-            else -> saveChartImage()
+                else -> viewModel.saveChartImage(coordinatesChart)
+            }
         }
     }
 
@@ -346,6 +291,9 @@ class HomeFragment : Fragment() {
                 when (effect) {
                     is HomeScreenEffect.ShowError -> {
                         handleError(effect.error)
+                    }
+                    is HomeScreenEffect.ShowImageSavedSnackbar -> {
+                        showImageSavedSnackbar(effect.uri)
                     }
                 }
             }
