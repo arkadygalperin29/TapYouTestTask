@@ -19,8 +19,7 @@ import javax.inject.Provider
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getAllPointsUsecase: Provider<GetAllPointsUsecase>,
-    private val dispatchers: AppDispatchers
+    private val getAllPointsUsecase: Provider<GetAllPointsUsecase>
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeScreenState())
@@ -33,9 +32,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
-                val result = withContext(dispatchers.io) {
-                    getAllPointsUsecase.get().execute(points)
-                }
+                val result = getAllPointsUsecase.get().execute(points)
                 _state.update { currentState ->
                     currentState.copy(
                         points = result
