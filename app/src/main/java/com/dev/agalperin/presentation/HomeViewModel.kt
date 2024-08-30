@@ -1,16 +1,12 @@
 package com.dev.agalperin.presentation
 
-import android.app.Application
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.view.View
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dev.agalperin.domain.GetAllPointsUsecase
@@ -49,7 +45,7 @@ class HomeViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
             getAllPointsUsecase.get().execute(points)
                 .onSuccess { resultPoints ->
-                    val comparedPoints = resultPoints.sortedBy { point -> point.x}
+                    val comparedPoints = resultPoints.sortedBy { point -> point.x }
                     _state.update { currentState ->
                         currentState.copy(
                             points = comparedPoints
@@ -59,6 +55,62 @@ class HomeViewModel @Inject constructor(
                     handleError(throwable)
                 }
             _state.update { it.copy(isLoading = false) }
+        }
+    }
+
+    fun saveChartImage(bitmap: Bitmap) {
+        viewModelScope.launch {
+            val filename = "chart_image_${System.currentTimeMillis()}.png"
+            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                saveImageToStorageAboveQ(bitmap, filename)
+            } else {
+                saveImageToStorageBelowQ(bitmap, filename)
+            }
+            _effects.emit(HomeScreenEffect.ShowImageSavedSnackbar(uri))
+        }
+    }
+
+    private suspend fun saveImageToStorageAboveQ(bitmap: Bitmap, filename: String): Uri? {
+        return withContext(dispatchers.default) {
+            try {
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+                }
+                val uri = context.contentResolver.insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    contentValues
+                )
+                uri?.let {
+                    context.contentResolver.openOutputStream(it).use { outputStream ->
+                        if (outputStream != null) {
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                        }
+                    }
+                }
+                uri
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    private suspend fun saveImageToStorageBelowQ(bitmap: Bitmap, filename: String): Uri? {
+        return withContext(dispatchers.default) {
+            try {
+                val picturesDir =
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                val imageFile = File(picturesDir, filename)
+                FileOutputStream(imageFile).use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                }
+                Uri.fromFile(imageFile)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
         }
     }
 

@@ -229,50 +229,9 @@ class HomeFragment : Fragment() {
             val canvas = Canvas(bitmap)
             coordinatesChart.draw(canvas)
 
-            val filename = "chart_image_${System.currentTimeMillis()}.png"
-            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                saveImageToStorageAboveQ(bitmap, filename) //not main thread viewmodel
-            } else {
-                saveImageToStorageBelowQ(bitmap, filename)  //not main thread from viewmodel
-            }
-
-            uri?.let {
-                showImageSavedSnackbar(it) //viewmodel dispatcher default
-            }
+            viewModel.saveChartImage(bitmap)
         }
     }
-
-    private fun saveImageToStorageAboveQ(bitmap: Bitmap, filename: String): Uri? {
-        //viewmodel dispatcher default
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
-            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-        }
-        val uri = requireContext().contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
-        )
-        uri?.let {
-            requireContext().contentResolver.openOutputStream(it).use { outputStream ->
-                if (outputStream != null) {
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                }
-            }
-        }
-        return uri
-    }
-
-    private fun saveImageToStorageBelowQ(bitmap: Bitmap, filename: String): Uri? {
-        val picturesDir =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        val imageFile = File(picturesDir, filename)
-        FileOutputStream(imageFile).use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-        }
-        return Uri.fromFile(imageFile)
-    }
-
 
     private fun initSaveChartButton(requestPermissionLauncher: ActivityResultLauncher<String>) {
         binding?.apply {
@@ -348,7 +307,7 @@ class HomeFragment : Fragment() {
                         handleError(effect.error)
                     }
                     is HomeScreenEffect.ShowImageSavedSnackbar -> {
-                        showImageSavedSnackbar(effect.uri)
+                        effect.uri?.let { showImageSavedSnackbar(it) }
                     }
                 }
             }
