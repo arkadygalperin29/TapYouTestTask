@@ -201,6 +201,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun saveChartImage() {
+        //need try catch for bitmap
         binding?.apply {
             val bitmap = Bitmap.createBitmap(
                 coordinatesChart.width,
@@ -212,18 +213,19 @@ class HomeFragment : Fragment() {
 
             val filename = "chart_image_${System.currentTimeMillis()}.png"
             val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                saveImageToStorageAboveQ(bitmap, filename)
+                saveImageToStorageAboveQ(bitmap, filename) //not main thread viewmodel
             } else {
-                saveImageToStorageBelowQ(bitmap, filename)
+                saveImageToStorageBelowQ(bitmap, filename)  //not main thread from viewmodel
             }
 
             uri?.let {
-                showImageSavedSnackbar(it)
+                showImageSavedSnackbar(it) //viewmodel dispatcher default
             }
         }
     }
 
     private fun saveImageToStorageAboveQ(bitmap: Bitmap, filename: String): Uri? {
+        //viewmodel dispatcher default
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/png")

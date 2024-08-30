@@ -8,12 +8,11 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TapYouRepositoryImpl @Inject constructor(
-    private val tapYouApi: TapYouApi,
-    private val dispatchers: AppDispatchers
+    private val tapYouApi: TapYouApi
 ) : TapYouRepository {
 
-    override suspend fun getPointsFromApi(count: Int): List<Point> {
-        return withContext(dispatchers.io) {
+    override suspend fun getPointsFromApi(count: Int): Result<List<Point>> {
+        return runCatching {
             tapYouApi.getPoints(count).pointsList.map { it.toPoint() }
         }
     }

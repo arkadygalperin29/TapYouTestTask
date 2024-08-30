@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dev.agalperin.domain.GetAllPointsUsecase
 import com.dev.agalperin.utils.ErrorType
-import com.dev.core.AppDispatchers
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import javax.inject.Inject
 import javax.inject.Provider
@@ -31,21 +29,33 @@ class HomeViewModel @Inject constructor(
     fun getAllPoints(points: Int) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            try {
-                val result = getAllPointsUsecase.get().execute(points)
-                _state.update { currentState ->
-                    currentState.copy(
-                        points = result
-                    )
+            getAllPointsUsecase.get().execute(points)
+                .onSuccess { resultPoints ->
+                    _state.update { currentState ->
+                        currentState.copy(
+                            points = resultPoints
+                        )
+                    }
+                }.onFailure { throwable ->
+                    when (throwable) {
+                        is HttpException -> {
+                            val errorMessage = throwable.response()?.errorBody()?.string()
+                            _effects.emit(
+                                HomeScreenEffect.ShowError(
+                                    ErrorType.HttpError(
+                                        errorMessage
+                                    )
+                                )
+                            )
+                        }
+
+                        else -> {
+                            _effects.emit(HomeScreenEffect.ShowError(ErrorType.UndefinedError(throwable)))
+                        }
+                    }
+
                 }
-            } catch (e: HttpException) {
-                val errorMessage = e.response()?.errorBody()?.string()
-                _effects.emit(HomeScreenEffect.ShowError(ErrorType.HttpError(errorMessage)))
-            } catch (e: Exception) {
-                _effects.emit(HomeScreenEffect.ShowError(ErrorType.UndefinedError(e)))
-            } finally {
-                _state.update { it.copy(isLoading = false) }
-            }
+            _state.update { it.copy(isLoading = false) }
         }
     }
 }
