@@ -1,9 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.navigation.fragment.safeargs)
+    alias(libs.plugins.kapt)
 }
 
 android {
@@ -35,6 +35,10 @@ android {
         )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    hilt {
+        enableAggregatingTask = true
     }
 
     buildTypes {
