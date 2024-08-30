@@ -25,6 +25,7 @@ kotlinx-coroutines = "1.8.0"
 android-lifecycle = "2.7.0"
 jakarta-inject = "2.0.1"
 ksp = "1.9.22-1.0.17"
+junitJupiter = "5.8.1"
 
 [libraries]
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
@@ -66,6 +67,7 @@ jakarta-inject = { module = "jakarta.inject:jakarta.inject-api", version.ref = "
 
 dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 
 
 [plugins]
