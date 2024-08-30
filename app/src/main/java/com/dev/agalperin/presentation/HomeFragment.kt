@@ -70,7 +70,7 @@ class HomeFragment : Fragment() {
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
                 if (isGranted) {
-                    binding?.coordinatesChart?.let { viewModel.saveChartImage(it) }
+                    saveChartImage()
                 } else {
                     showPermissionDeniedSnackbar()
                 }
@@ -210,14 +210,69 @@ class HomeFragment : Fragment() {
                     ) {
                         requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     } else {
-                        viewModel.saveChartImage(coordinatesChart)
+                        saveChartImage()
                     }
                 }
 
-                else -> viewModel.saveChartImage(coordinatesChart)
+                else -> saveChartImage()
             }
         }
     }
+
+    private fun saveChartImage() {
+        binding?.apply {
+            val bitmap = Bitmap.createBitmap(
+                coordinatesChart.width,
+                coordinatesChart.height,
+                Bitmap.Config.ARGB_8888
+            )
+            val canvas = Canvas(bitmap)
+            coordinatesChart.draw(canvas)
+
+            val filename = "chart_image_${System.currentTimeMillis()}.png"
+            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                saveImageToStorageAboveQ(bitmap, filename) //not main thread viewmodel
+            } else {
+                saveImageToStorageBelowQ(bitmap, filename)  //not main thread from viewmodel
+            }
+
+            uri?.let {
+                showImageSavedSnackbar(it) //viewmodel dispatcher default
+            }
+        }
+    }
+
+    private fun saveImageToStorageAboveQ(bitmap: Bitmap, filename: String): Uri? {
+        //viewmodel dispatcher default
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+        }
+        val uri = requireContext().contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )
+        uri?.let {
+            requireContext().contentResolver.openOutputStream(it).use { outputStream ->
+                if (outputStream != null) {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                }
+            }
+        }
+        return uri
+    }
+
+    private fun saveImageToStorageBelowQ(bitmap: Bitmap, filename: String): Uri? {
+        val picturesDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val imageFile = File(picturesDir, filename)
+        FileOutputStream(imageFile).use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        }
+        return Uri.fromFile(imageFile)
+    }
+
 
     private fun initSaveChartButton(requestPermissionLauncher: ActivityResultLauncher<String>) {
         binding?.apply {
