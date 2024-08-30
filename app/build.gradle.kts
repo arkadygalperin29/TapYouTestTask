@@ -1,9 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.navigation.fragment.safeargs)
-    alias(libs.plugins.kapt)
 }
 
 android {
@@ -34,7 +34,7 @@ android {
             "\"https://hr-challenge.dev.tapyou.com/\""
         )
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.MockitoJUnitRunner"
     }
 
     hilt {
@@ -66,17 +66,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    testImplementation(libs.junit.jupiter)
-    androidTestImplementation ("androidx.test:core:1.6.1")
-    androidTestImplementation ("androidx.test:core-ktx:1.6.1")
-
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockk)
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.kotlin)
 
     implementation(libs.kotlinx.coroutines.core)
 
@@ -93,7 +82,22 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
 
     implementation(libs.dagger.hilt.android)
-    kapt(libs.dagger.hilt.compiler)
+    ksp(libs.hilt.android.compiler)
+
+    //tests
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.inline)
+
+    androidTestImplementation(libs.mockito.core) {
+        exclude("net.bytebuddy")
+    }
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.test.mockito.android)
+    androidTestImplementation(libs.test.android.hilt)
+    androidTestImplementation(libs.test.androidx.junit)
 
     implementation(project(":tapyouapi"))
     testImplementation (project(":tapyouapi"))

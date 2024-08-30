@@ -1,5 +1,6 @@
 package com.dev.agalperin
 
+import com.dev.core.AppDispatchers
 import org.junit.Test
 
 import org.junit.Assert.*

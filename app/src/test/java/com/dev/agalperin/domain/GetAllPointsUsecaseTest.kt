@@ -1,20 +1,26 @@
 package com.dev.agalperin.domain
 
+import org.junit.Before
+
+import com.dev.agalperin.domain.GetAllPointsUsecase
+import com.dev.agalperin.domain.TapYouRepository
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
+import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class GetAllPointsUsecaseTest {
 
-    private lateinit var usecase: GetAllPointsUsecase
-    private val repository: TapYouRepository = mock(TapYouRepository::class.java)
+    private lateinit var classUnderTest: GetAllPointsUsecase
 
-//    @BeforeEach
-//    fun setUp() {
-//        usecase = GetAllPointsUsecase(repository)
-//    }
+    @Mock
+    private lateinit var mockRepository: TapYouRepository
+
+    @Before
+    fun setUp() {
+        classUnderTest = GetAllPointsUsecase(mockRepository)
+    }
 
     @Test
     fun execute() {
