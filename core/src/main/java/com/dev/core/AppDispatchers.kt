@@ -7,6 +7,6 @@ import kotlinx.coroutines.MainCoroutineDispatcher
 open class AppDispatchers(
     val default: CoroutineDispatcher = Dispatchers.Default,
     val io: CoroutineDispatcher = Dispatchers.IO,
-    val main: MainCoroutineDispatcher = Dispatchers.Main,
+    val main: CoroutineDispatcher = Dispatchers.Main,
     val unconfined: CoroutineDispatcher = Dispatchers.Unconfined
 )

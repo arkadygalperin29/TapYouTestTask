@@ -307,7 +307,12 @@ class HomeFragment : Fragment() {
                         handleError(effect.error)
                     }
                     is HomeScreenEffect.ShowImageSavedSnackbar -> {
-                        effect.uri?.let { showImageSavedSnackbar(it) }
+                        if (effect.uri == null) {
+                            Toast.makeText(requireContext(),
+                                getString(R.string.couldnt_save_the_uri_for_chart_toast_hint), Toast.LENGTH_LONG)
+                        } else {
+                            showImageSavedSnackbar(effect.uri)
+                        }
                     }
                 }
             }

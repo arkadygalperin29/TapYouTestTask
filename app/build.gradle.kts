@@ -90,6 +90,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockito.inline)
+    testImplementation(libs.turbine)
 
     androidTestImplementation(libs.mockito.core) {
         exclude("net.bytebuddy")
@@ -98,6 +99,8 @@ dependencies {
     androidTestImplementation(libs.test.mockito.android)
     androidTestImplementation(libs.test.android.hilt)
     androidTestImplementation(libs.test.androidx.junit)
+
+
 
     implementation(project(":tapyouapi"))
     testImplementation (project(":tapyouapi"))

@@ -14,4 +14,5 @@
     <string name="navigate_to_gallery_after_saved_image_hint">Перейти в галерею</string>
     <string name="linedata_label">points</string>
     <string name="navigate_to_settings_snackbar_action_hint">Перейти в настройки</string>
+    <string name="couldnt_save_the_uri_for_chart_toast_hint">Не удалось сохранить график</string>
 </resources>
