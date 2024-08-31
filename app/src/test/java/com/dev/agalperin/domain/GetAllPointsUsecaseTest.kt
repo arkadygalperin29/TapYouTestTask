@@ -15,7 +15,6 @@ import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
-import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(JUnit4::class)
 class GetAllPointsUsecaseTest {

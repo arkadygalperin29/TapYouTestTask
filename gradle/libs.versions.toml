@@ -26,7 +26,6 @@ android-lifecycle = "2.7.0"
 jakarta-inject = "2.0.1"
 ksp = "1.9.22-1.0.17"
 kotlinxCoroutinesTest = "1.8.0"
-mockk = "1.13.5"
 turbine = "1.0.0"
 
 [libraries]
@@ -49,7 +48,6 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 test-android-hilt = { module = "com.google.dagger:hilt-android-testing", version.ref = "dagger" }
 test-mockito-android = { module = "com.linkedin.dexmaker:dexmaker-mockito-inline", version.ref = "test-mockito-android" }
 
