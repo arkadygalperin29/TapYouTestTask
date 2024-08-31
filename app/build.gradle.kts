@@ -41,6 +41,15 @@ android {
         enableAggregatingTask = true
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("../keystore.jks")
+            storePassword = "123456"
+            keyAlias = "key"
+            keyPassword = "123456"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
