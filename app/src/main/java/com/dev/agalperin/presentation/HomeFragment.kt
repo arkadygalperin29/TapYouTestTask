@@ -14,6 +14,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -31,6 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.RequestManager
 import com.dev.agalperin.R
 import com.dev.agalperin.databinding.FragmentHomeBinding
+import com.dev.agalperin.utils.DecimalInputFilter
 import com.dev.agalperin.utils.ErrorType
 import com.dev.agalperin.utils.KeyboardUtil
 import com.github.mikephil.charting.data.Entry
@@ -133,6 +135,11 @@ class HomeFragment : Fragment() {
 
     private fun initViews() {
         binding?.apply {
+            // Just a little addon for samsung keyboards just in case, we don't want a user to print a dot
+            // or anything numberDecimal allows outside of numbers depending on locale's.
+            // Samsung keyboards are known for not being able to read xml declarations,
+            // that's why need a custom DecimalInputFilter for this.
+            inputDotsNumberEt.filters = arrayOf(DecimalInputFilter(), InputFilter.LengthFilter(4))
 
             launchCoordinatesButton.isEnabled = false
 
@@ -149,7 +156,7 @@ class HomeFragment : Fragment() {
                     // Check if the input is a valid integer within the range, so we don't allow user to send errors intentionally ;)
                     val text = s.toString()
                     val number = text.toIntOrNull()
-                    launchCoordinatesButton.isEnabled = number != null && number in 1 until 1000
+                    launchCoordinatesButton.isEnabled = number != null && number in 1 until 1001
                 }
 
                 override fun afterTextChanged(s: Editable?) {}

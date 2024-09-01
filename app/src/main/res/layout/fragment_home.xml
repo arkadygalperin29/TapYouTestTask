@@ -40,8 +40,7 @@
                 android:layout_height="match_parent"
                 android:hint="@string/enter_the_digit"
                 android:textSize="@dimen/_12sp"
-                android:inputType="numberDecimal"
-                android:maxLength="4"/>
+                android:inputType="numberDecimal" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
